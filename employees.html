@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,43 +53,46 @@
                 type="text"
                 id="employeeId"
                 class="form-control mb-2"
-                placeholder="Employee ID"
-            >
+                placeholder="Employee ID">
 
             <input
                 type="text"
                 id="fullName"
                 class="form-control mb-2"
-                placeholder="Full Name"
-            >
+                placeholder="Full Name">
 
             <input
                 type="text"
                 id="position"
                 class="form-control mb-2"
-                placeholder="Position"
-            >
+                placeholder="Position">
 
             <input
                 type="text"
                 id="department"
                 class="form-control mb-2"
-                placeholder="Department"
-            >
+                placeholder="Department">
 
             <select
                 id="employeeType"
-                class="form-select mb-2"
-            >
-                <option value="office">Office Staff</option>
-                <option value="driver">Driver</option>
+                class="form-select mb-2">
+
+                <option value="office">
+                    Office Staff
+                </option>
+
+                <option value="driver">
+                    Driver
+                </option>
+
             </select>
 
             <button
                 class="btn btn-primary"
-                onclick="saveEmployee()"
-            >
+                onclick="saveEmployee()">
+
                 Save Employee
+
             </button>
 
         </div>
@@ -100,15 +104,19 @@
         <table class="table table-bordered table-striped">
 
             <thead class="table-dark">
+
                 <tr>
                     <th>Employee ID</th>
                     <th>Name</th>
                     <th>Position</th>
                     <th>Status</th>
                 </tr>
+
             </thead>
 
-            <tbody id="employeeTable"></tbody>
+            <tbody id="employeeTable">
+
+            </tbody>
 
         </table>
 
@@ -122,4 +130,5 @@
     <script src="js/employees.js"></script>
 
 </body>
+
 </html>
