@@ -1,5 +1,8 @@
-console.log("employees.js loaded");
-async function saveEmployee() {
+console.log("EMPLOYEES JS LOADED");
+
+function saveEmployee() {
+    alert("Button Working");
+}
 
     const employeeId =
         document.getElementById("employeeId").value;
