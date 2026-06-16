@@ -1,4 +1,3 @@
-```javascript
 async function loadDrivers(){
 
     const { data, error } =
@@ -98,4 +97,3 @@ setInterval(
     loadDrivers,
     3000
 );
-```
