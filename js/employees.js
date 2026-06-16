@@ -1,3 +1,4 @@
+console.log("employees.js loaded");
 async function saveEmployee() {
 
     const employeeId =
