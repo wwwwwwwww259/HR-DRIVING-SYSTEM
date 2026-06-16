@@ -1,4 +1,3 @@
-```javascript
 let currentEmployee = null;
 
 async function searchEmployee() {
@@ -239,4 +238,3 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
 });
-```
