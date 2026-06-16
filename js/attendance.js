@@ -2,185 +2,246 @@ let currentEmployee = null;
 
 async function searchEmployee() {
 
-const employeeId =
-document.getElementById(
-"searchEmployee"
-).value;
+    const employeeId =
+        document.getElementById(
+            "searchEmployee"
+        ).value.trim();
 
-const { data, error } =
-await supabaseClient
-.from("employees")
-.select("*")
-.eq(
-"employee_id",
-employeeId
-)
-.single();
+    if (!employeeId) {
 
-if(error){
+        alert("Enter Employee ID");
 
-alert("Employee Not Found");
+        return;
+    }
 
-return;
+    const { data, error } =
+        await supabaseClient
+            .from("employees")
+            .select("*")
+            .eq("employee_id", employeeId)
+            .single();
+
+    if (error || !data) {
+
+        alert("Employee Not Found");
+
+        document.getElementById(
+            "employeeCard"
+        ).innerHTML = "";
+
+        return;
+    }
+
+    currentEmployee = data;
+
+    document.getElementById(
+        "employeeCard"
+    ).innerHTML = `
+
+    <div class="card p-4">
+
+        <h3>${data.full_name}</h3>
+
+        <p>
+            Employee ID:
+            <strong>${data.employee_id}</strong>
+        </p>
+
+        <p>
+            Position:
+            <strong>${data.position || ""}</strong>
+        </p>
+
+        <p>
+            Department:
+            <strong>${data.department || ""}</strong>
+        </p>
+
+        <p>
+            Status:
+            <strong>${data.status}</strong>
+        </p>
+
+        <div class="row">
+
+            <div class="col-md-3 mb-2">
+
+                <button
+                    class="btn btn-success w-100"
+                    onclick="recordAction('TIME_IN')">
+
+                    TIME IN
+
+                </button>
+
+            </div>
+
+            <div class="col-md-3 mb-2">
+
+                <button
+                    class="btn btn-danger w-100"
+                    onclick="recordAction('TIME_OUT')">
+
+                    TIME OUT
+
+                </button>
+
+            </div>
+
+            <div class="col-md-3 mb-2">
+
+                <button
+                    class="btn btn-warning w-100"
+                    onclick="recordAction('BREAK_OUT')">
+
+                    BREAK OUT
+
+                </button>
+
+            </div>
+
+            <div class="col-md-3 mb-2">
+
+                <button
+                    class="btn btn-info w-100"
+                    onclick="recordAction('BREAK_IN')">
+
+                    BREAK IN
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="row mt-2">
+
+            <div class="col-md-6">
+
+                <button
+                    class="btn btn-dark w-100"
+                    onclick="startTrip()">
+
+                    START TRIP
+
+                </button>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <button
+                    class="btn btn-secondary w-100"
+                    onclick="endTrip()">
+
+                    END TRIP
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    `;
 }
 
-currentEmployee = data;
+async function recordAction(action) {
 
-document.getElementById(
-"employeeCard"
-).innerHTML = `
+    if (!currentEmployee) {
 
-<div class="card p-4">
+        alert("Search Employee First");
 
-<h3>${data.full_name}</h3>
+        return;
+    }
 
-<p>
-Position:
-${data.position}
-</p>
+    await supabaseClient
+        .from("attendance")
+        .insert([
+            {
+                employee_id:
+                    currentEmployee.employee_id,
 
-<p>
-Department:
-${data.department}
-</p>
+                action:
+                    action
+            }
+        ]);
 
-<p>
-Status:
-<strong>
-${data.status}
-</strong>
-</p>
+    let newStatus =
+        currentEmployee.status;
 
-<div class="row">
+    if (action === "TIME_IN")
+        newStatus = "AVAILABLE";
 
-<div class="col-md-3 mb-2">
+    if (action === "TIME_OUT")
+        newStatus = "OFF_DUTY";
 
-<button
-class="btn btn-success w-100"
-onclick="recordAction('TIME_IN')">
+    if (action === "BREAK_OUT")
+        newStatus = "BREAK";
 
-TIME IN
+    if (action === "BREAK_IN")
+        newStatus = "AVAILABLE";
 
-</button>
+    await supabaseClient
+        .from("employees")
+        .update({
+            status: newStatus
+        })
+        .eq(
+            "employee_id",
+            currentEmployee.employee_id
+        );
 
-</div>
+    alert(action + " Recorded");
 
-<div class="col-md-3 mb-2">
-
-<button
-class="btn btn-danger w-100"
-onclick="recordAction('TIME_OUT')">
-
-TIME OUT
-
-</button>
-
-</div>
-
-<div class="col-md-3 mb-2">
-
-<button
-class="btn btn-warning w-100"
-onclick="recordAction('BREAK_OUT')">
-
-BREAK OUT
-
-</button>
-
-</div>
-
-<div class="col-md-3 mb-2">
-
-<button
-class="btn btn-info w-100"
-onclick="recordAction('BREAK_IN')">
-
-BREAK IN
-
-</button>
-
-</div>
-
-</div>
-
-<div class="row mt-2">
-
-<div class="col-md-6">
-
-<button
-class="btn btn-dark w-100"
-onclick="startTrip()">
-
-START TRIP
-
-</button>
-
-</div>
-
-<div class="col-md-6">
-
-<button
-class="btn btn-secondary w-100"
-onclick="endTrip()">
-
-END TRIP
-
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-`;
+    searchEmployee();
 }
 
-async function recordAction(action){
+async function startTrip() {
 
-if(!currentEmployee){
+    if (!currentEmployee) {
 
-return;
+        alert("Search Employee First");
+
+        return;
+    }
+
+    await supabaseClient
+        .from("employees")
+        .update({
+            status: "DRIVING"
+        })
+        .eq(
+            "employee_id",
+            currentEmployee.employee_id
+        );
+
+    alert("Trip Started");
+
+    searchEmployee();
 }
 
-await supabaseClient
-.from("attendance")
-.insert([
-{
-employee_id:
-currentEmployee.employee_id,
+async function endTrip() {
 
-action:
-action
-}
-]);
+    if (!currentEmployee) {
 
-let newStatus =
-currentEmployee.status;
+        alert("Search Employee First");
 
-if(action === "TIME_IN")
-newStatus = "AVAILABLE";
+        return;
+    }
 
-if(action === "TIME_OUT")
-newStatus = "OFF_DUTY";
+    await supabaseClient
+        .from("employees")
+        .update({
+            status: "AVAILABLE"
+        })
+        .eq(
+            "employee_id",
+            currentEmployee.employee_id
+        );
 
-if(action === "BREAK_OUT")
-newStatus = "BREAK";
+    alert("Trip Ended");
 
-if(action === "BREAK_IN")
-newStatus = "AVAILABLE";
-
-await supabaseClient
-.from("employees")
-.update({
-status:newStatus
-})
-.eq(
-"employee_id",
-currentEmployee.employee_id
-);
-
-alert(action + " Recorded");
-
-searchEmployee();
+    searchEmployee();
 }
