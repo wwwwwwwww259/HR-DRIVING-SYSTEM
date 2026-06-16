@@ -1,73 +1,90 @@
-console.log("EMPLOYEES JS LOADED");
+console.log("Employees JS Loaded");
 
-function saveEmployee() {
-    alert("Button Working");
+async function saveEmployee() {
+
+  const employeeId =
+    document.getElementById("employeeId").value;
+
+  const fullName =
+    document.getElementById("fullName").value;
+
+  const position =
+    document.getElementById("position").value;
+
+  const department =
+    document.getElementById("department").value;
+
+  const employeeType =
+    document.getElementById("employeeType").value;
+
+  if (!employeeId || !fullName) {
+    alert("Employee ID and Full Name are required");
+    return;
+  }
+
+  const { data, error } =
+    await supabaseClient
+      .from("employees")
+      .insert([
+        {
+          employee_id: employeeId,
+          full_name: fullName,
+          position: position,
+          department: department,
+          employee_type: employeeType,
+          status: "OFF_DUTY"
+        }
+      ]);
+
+  if (error) {
+    console.error(error);
+    alert(error.message);
+    return;
+  }
+
+  alert("Employee Saved");
+
+  document.getElementById("employeeId").value = "";
+  document.getElementById("fullName").value = "";
+  document.getElementById("position").value = "";
+  document.getElementById("department").value = "";
+
+  loadEmployees();
 }
 
-    const employeeId =
-        document.getElementById("employeeId").value;
+async function loadEmployees() {
 
-    const fullName =
-        document.getElementById("fullName").value;
+  const { data, error } =
+    await supabaseClient
+      .from("employees")
+      .select("*")
+      .order("id", {
+        ascending: false
+      });
 
-    const position =
-        document.getElementById("position").value;
+  if (error) {
+    console.error(error);
+    return;
+  }
 
-    const department =
-        document.getElementById("department").value;
+  let html = "";
 
-    const employeeType =
-        document.getElementById("employeeType").value;
+  data.forEach(emp => {
 
-    const { error } =
-        await supabaseClient
-        .from("employees")
-        .insert([
-            {
-                employee_id: employeeId,
-                full_name: fullName,
-                position: position,
-                department: department,
-                employee_type: employeeType
-            }
-        ]);
+    html += `
+      <tr>
+        <td>${emp.employee_id}</td>
+        <td>${emp.full_name}</td>
+        <td>${emp.position || ""}</td>
+        <td>${emp.status || ""}</td>
+      </tr>
+    `;
 
-    if(error){
-        alert(error.message);
-        return;
-    }
+  });
 
-    alert("Employee Saved");
-
-    loadEmployees();
-}
-
-async function loadEmployees(){
-
-    const { data, error } =
-        await supabaseClient
-        .from("employees")
-        .select("*")
-        .order("id",{ascending:false});
-
-    let html = "";
-
-    data.forEach(emp => {
-
-        html += `
-        <tr>
-            <td>${emp.employee_id}</td>
-            <td>${emp.full_name}</td>
-            <td>${emp.position}</td>
-            <td>${emp.status}</td>
-        </tr>
-        `;
-
-    });
-
-    document.getElementById(
-        "employeeTable"
-    ).innerHTML = html;
+  document.getElementById(
+    "employeeTable"
+  ).innerHTML = html;
 }
 
 loadEmployees();
