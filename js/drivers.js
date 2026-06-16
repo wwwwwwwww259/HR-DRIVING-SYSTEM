@@ -4,16 +4,8 @@ async function loadDrivers(){
         await supabaseClient
             .from("employees")
             .select("*")
-            .eq(
-                "employee_type",
-                "driver"
-            )
-            .order(
-                "full_name",
-                {
-                    ascending:true
-                }
-            );
+            .eq("employee_type","driver")
+            .order("full_name");
 
     if(error){
 
@@ -26,63 +18,30 @@ async function loadDrivers(){
 
     data.forEach(driver => {
 
-        let badge =
-            "secondary";
+        let badge = "secondary";
 
-        if(
-            driver.status ===
-            "AVAILABLE"
-        ){
-            badge =
-            "success";
-        }
+        if(driver.status === "AVAILABLE")
+            badge = "success";
 
-        if(
-            driver.status ===
-            "DRIVING"
-        ){
-            badge =
-            "dark";
-        }
+        if(driver.status === "DRIVING")
+            badge = "dark";
 
-        if(
-            driver.status ===
-            "ON_BREAK"
-        ){
-            badge =
-            "warning";
-        }
+        if(driver.status === "ON_BREAK")
+            badge = "warning";
 
-        if(
-            driver.status ===
-            "OFF_DUTY"
-        ){
-            badge =
-            "danger";
-        }
+        if(driver.status === "OFF_DUTY")
+            badge = "danger";
 
         html += `
-
         <tr>
-
+            <td>${driver.employee_id}</td>
+            <td>${driver.full_name}</td>
             <td>
-                ${driver.employee_id}
-            </td>
-
-            <td>
-                ${driver.full_name}
-            </td>
-
-            <td>
-
                 <span class="badge bg-${badge}">
                     ${driver.status}
                 </span>
-
             </td>
-
         </tr>
-
         `;
     });
 
