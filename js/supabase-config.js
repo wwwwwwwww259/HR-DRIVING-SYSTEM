@@ -2,7 +2,7 @@ const SUPABASE_URL =
   "https://odpvxqpkqsnzjpkgizeo.supabase.co";
 
 const SUPABASE_ANON_KEY =
-  "ILAGAY_DITO_ANG_BUONG_PUBLISHABLE_KEY";
+  "sb_publishable_lK2ut9NJnOaZFJaZMDabmw_qSZxP6L6";
 
 const supabaseClient =
   supabase.createClient(
