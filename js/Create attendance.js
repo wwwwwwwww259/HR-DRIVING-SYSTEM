@@ -118,3 +118,107 @@ async function recordAttendance(action){
 
     searchEmployee();
 }
+
+async function startTrip(){
+
+    if(!currentEmployee){
+        return;
+    }
+
+    const origin =
+        prompt("Origin:");
+
+    const destination =
+        prompt("Destination:");
+
+    if(!origin || !destination){
+        return;
+    }
+
+    await supabaseClient
+        .from("driver_trips")
+        .insert([
+            {
+                driver_id:
+                    currentEmployee.employee_id,
+
+                origin: origin,
+
+                destination: destination,
+
+                status: "DRIVING"
+            }
+        ]);
+
+    await supabaseClient
+        .from("employees")
+        .update({
+            status: "DRIVING"
+        })
+        .eq(
+            "employee_id",
+            currentEmployee.employee_id
+        );
+
+    alert("Trip Started");
+
+    searchEmployee();
+}
+
+async function endTrip(){
+
+    if(!currentEmployee){
+        return;
+    }
+
+    const { data } =
+        await supabaseClient
+            .from("driver_trips")
+            .select("*")
+            .eq(
+                "driver_id",
+                currentEmployee.employee_id
+            )
+            .is("end_time", null)
+            .order("id", {
+                ascending:false
+            })
+            .limit(1);
+
+    if(!data || data.length === 0){
+
+        alert("No Active Trip");
+
+        return;
+    }
+
+    await supabaseClient
+        .from("driver_trips")
+        .update({
+
+            end_time:
+                new Date(),
+
+            status:
+                "COMPLETED"
+
+        })
+        .eq(
+            "id",
+            data[0].id
+        );
+
+    await supabaseClient
+        .from("employees")
+        .update({
+            status:"AVAILABLE"
+        })
+        .eq(
+            "employee_id",
+            currentEmployee.employee_id
+        );
+
+    alert("Trip Completed");
+
+    searchEmployee();
+}
