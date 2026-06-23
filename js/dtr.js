@@ -1,54 +1,68 @@
 async function generateDTR() {
 
+    const employee =
+        document.getElementById(
+            "employeeSearch"
+        ).value.toLowerCase();
 
-const employee =
-    document.getElementById(
-        "employeeSearch"
-    ).value.toLowerCase();
+    const { data, error } =
+        await supabaseClient
+            .from("attendance_daily")
+            .select("*")
+            .order(
+                "attendance_date",
+                {
+                    ascending: false
+                }
+            );
 
-const { data, error } =
-    await supabaseClient
-        .from("attendance_logs")
-        .select("*")
-        .order(
-            "log_time",
-            {
-                ascending: false
-            }
-        );
+    if (error) {
 
-if (error) {
-
-    console.error(error);
-
-    return;
-}
-
-let html = "";
-
-data.forEach(log => {
-
-    if (
-        employee &&
-        !log.employee_name
-            .toLowerCase()
-            .includes(employee)
-    ) {
+        console.error(error);
         return;
     }
 
-    html += `
-    <tr>
-        <td>${new Date(log.log_time).toLocaleDateString()}</td>
-        <td>${log.action}</td>
-        <td>${new Date(log.log_time).toLocaleTimeString()}</td>
-    </tr>
-    `;
-});
+    let html = "";
 
-document.getElementById(
-    "dtrTable"
-).innerHTML = html;
+    data.forEach(record => {
 
+        if (
+            employee &&
+            !record.employee_name
+                .toLowerCase()
+                .includes(employee)
+        ) {
+            return;
+        }
 
+        html += `
+        <tr>
+
+            <td>${record.employee_name}</td>
+
+            <td>${record.attendance_date}</td>
+
+            <td>${record.am_in || "-"}</td>
+
+            <td>${record.break_time || "-"}</td>
+
+            <td>${record.pm_in || "-"}</td>
+
+            <td>${record.time_out || "-"}</td>
+
+            <td>${record.work_hours || "0h 0m"}</td>
+
+            <td>${record.ot_hours || "0h 0m"}</td>
+
+            <td>${record.status || "-"}</td>
+
+        </tr>
+        `;
+    });
+
+    document.getElementById(
+        "dtrTable"
+    ).innerHTML = html;
 }
+
+generateDTR();
